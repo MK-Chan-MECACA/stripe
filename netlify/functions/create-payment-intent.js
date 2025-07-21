@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
     // Create PaymentIntent with card method (online payment)
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency: currency || 'usd',
+      currency: currency || 'myr',
       payment_method_types: ['card_present'],
       capture_method: capture_method || 'automatic',
       description,
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
         amount,
         status: paymentIntent.status,
         description,
-        currency: currency || 'usd',
+        currency: currency || 'myr',
       },
     ]);
 
