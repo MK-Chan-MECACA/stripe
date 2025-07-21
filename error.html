@@ -8,6 +8,15 @@
 </head>
 <body>
   <h1>Oops! Something went wrong.</h1>
+  <div id="error-log" style="color: #ef4444; margin: 1em 0;"></div>
   <a href="index.html">Back to Home</a>
+  <script>
+    const logElem = document.getElementById('error-log');
+    const lastError = localStorage.getItem('lastError');
+    if (lastError) {
+      logElem.textContent = lastError;
+      localStorage.removeItem('lastError');
+    }
+  </script>
 </body>
 </html> 
