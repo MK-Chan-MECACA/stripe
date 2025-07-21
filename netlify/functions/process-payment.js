@@ -35,13 +35,23 @@ exports.handler = async (event, context) => {
       payment_intent: payment_intent_id,
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        status: result.payment_intent.status,
-        result
-      }),
-    };
+    if (result && result.payment_intent && result.payment_intent.status) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          status: result.payment_intent.status,
+          result
+        }),
+      };
+    } else {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: 'Stripe did not return a payment_intent',
+          details: result,
+        }),
+      };
+    }
   } catch (err) {
     console.error('Failed to process payment:', err);
     return {
