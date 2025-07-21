@@ -10,13 +10,21 @@
   <h1>Oops! Something went wrong.</h1>
   <div id="error-log" style="color: #ef4444; margin: 1em 0;"></div>
   <a href="index.html">Back to Home</a>
+  <button id="try-again" style="margin-left: 1em; padding: 0.5em 1em; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Try Again</button>
   <script>
     const logElem = document.getElementById('error-log');
     const lastError = localStorage.getItem('lastError');
     if (lastError) {
-      logElem.textContent = lastError;
+      if (lastError.includes('requires_payment_method')) {
+        logElem.textContent = 'No valid card was presented or the card was declined. Please try again with a valid card.';
+      } else {
+        logElem.textContent = lastError;
+      }
       localStorage.removeItem('lastError');
     }
+    document.getElementById('try-again').onclick = function() {
+      window.location.href = 'payment.html';
+    };
   </script>
 </body>
 </html> 
