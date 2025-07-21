@@ -35,11 +35,20 @@ exports.handler = async (event, context) => {
       payment_intent: payment_intent_id,
     });
 
+    let status;
     if (result && result.payment_intent && result.payment_intent.status) {
+      status = result.payment_intent.status;
+    } else if (result && result.action && result.action.status) {
+      status = result.action.status;
+    } else {
+      status = undefined;
+    }
+
+    if (status) {
       return {
         statusCode: 200,
         body: JSON.stringify({
-          status: result.payment_intent.status,
+          status,
           result
         }),
       };
@@ -47,7 +56,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: 'Stripe did not return a payment_intent',
+          error: 'Stripe did not return a recognizable status',
           details: result,
         }),
       };
