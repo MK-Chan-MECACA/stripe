@@ -35,14 +35,15 @@ async function pollPaymentStatus(paymentIntentId) {
     });
     const data = await res.json();
     status = data.status;
+    console.log('Stripe payment status:', status);
     paymentStatusElem.textContent = `Status: ${status}`;
     paymentStatusElem.className = '';
-    if (status === 'succeeded') paymentStatusElem.classList.add('success');
+    if (status === 'succeeded' || status === 'requires_capture') paymentStatusElem.classList.add('success');
     if (status === 'failed') paymentStatusElem.classList.add('error');
-    if (status === 'succeeded' || status === 'failed') break;
+    if (status === 'succeeded' || status === 'failed' || status === 'requires_capture') break;
     await new Promise(r => setTimeout(r, 2000));
   }
-  if (status === 'succeeded') {
+  if (status === 'succeeded' || status === 'requires_capture') {
     window.location.href = 'success.html';
   } else {
     // localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
