@@ -35,23 +35,19 @@ exports.handler = async (event, context) => {
       payment_intent: payment_intent_id,
     });
 
-    let status;
-    let paymentIntentId;
-
-    if (result && result.payment_intent && result.payment_intent.status) {
-      status = result.payment_intent.status;
+    let paymentIntentId = payment_intent_id;
+    if (result && result.payment_intent && result.payment_intent.id) {
       paymentIntentId = result.payment_intent.id;
-    } else if (result && result.action && result.action.status) {
-      status = result.action.status;
-      if (result.action.process_payment_intent && result.action.process_payment_intent.payment_intent) {
-        paymentIntentId = result.action.process_payment_intent.payment_intent;
-      }
+    } else if (result && result.action && result.action.process_payment_intent && result.action.process_payment_intent.payment_intent) {
+      paymentIntentId = result.action.process_payment_intent.payment_intent;
     }
 
-    // If status is still undefined or in_progress/processing, but we have a paymentIntentId, fetch it from Stripe
-    if ((!status || status === 'in_progress' || status === 'processing') && paymentIntentId) {
-      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-      status = pi.status;
+    // Always fetch the latest PaymentIntent from Stripe
+    let status = undefined;
+    let paymentIntentObj = null;
+    if (paymentIntentId) {
+      paymentIntentObj = await stripe.paymentIntents.retrieve(paymentIntentId);
+      status = paymentIntentObj.status;
     }
 
     if (status) {
@@ -59,6 +55,7 @@ exports.handler = async (event, context) => {
         statusCode: 200,
         body: JSON.stringify({
           status,
+          payment_intent: paymentIntentObj,
           result
         }),
       };
