@@ -1,0 +1,127 @@
+:root {
+  --primary-blue: #2563eb;
+  --primary-blue-dark: #1e40af;
+  --success-green: #22c55e;
+  --error-red: #ef4444;
+  --neutral-gray: #f3f4f6;
+  --neutral-gray-dark: #6b7280;
+  --white: #fff;
+  --border-radius: 8px;
+  --transition: 0.2s all;
+}
+
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: var(--neutral-gray);
+  color: var(--neutral-gray-dark);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  padding: 2rem;
+  margin: 2rem 0;
+  width: 100%;
+  max-width: 400px;
+}
+
+button, input[type="submit"] {
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-top: 1rem;
+}
+
+button:hover, input[type="submit"]:hover {
+  background: var(--primary-blue-dark);
+}
+
+input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--neutral-gray-dark);
+  border-radius: var(--border-radius);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background var(--transition);
+}
+
+.status-dot.connected {
+  background: var(--success-green);
+}
+
+.status-dot.disconnected {
+  background: var(--error-red);
+}
+
+.status-dot.unknown {
+  background: var(--neutral-gray-dark);
+}
+
+#payment-status {
+  margin-top: 1rem;
+  font-weight: 500;
+  min-height: 1.5em;
+}
+
+#payment-status.success {
+  color: var(--success-green);
+}
+
+#payment-status.error {
+  color: var(--error-red);
+}
+
+.loading-spinner {
+  border: 4px solid var(--neutral-gray);
+  border-top: 4px solid var(--primary-blue);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+  margin: 1rem auto;
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+    margin: 1rem 0;
+    max-width: 95vw;
+  }
+  button, input[type="submit"] {
+    width: 100%;
+  }
+} 
