@@ -37,7 +37,10 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ result }),
+      body: JSON.stringify({
+        status: result.payment_intent.status,
+        result
+      }),
     };
   } catch (err) {
     console.error('Failed to process payment:', err);
