@@ -20,11 +20,12 @@ async function createPaymentIntent(amount) {
 async function pollPaymentStatus(paymentIntentId) {
   let status = 'processing';
   const paymentStatusElem = document.getElementById('payment-status');
+  const readerId = 'tmr_GHqYoAltN8ohZX'; // Hardcoded reader_id
   while (status === 'processing') {
     const res = await fetch('/.netlify/functions/process-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: paymentIntentId })
+      body: JSON.stringify({ payment_intent_id: paymentIntentId, reader_id: readerId })
     });
     const data = await res.json();
     status = data.status;
