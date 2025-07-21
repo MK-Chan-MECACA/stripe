@@ -46,11 +46,8 @@ async function pollPaymentStatus(paymentIntentId) {
   if (status === 'succeeded' || status === 'requires_capture') {
     window.location.href = 'success.html';
   } else {
-    // localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
-    // window.location.href = 'error.html';
-    // Do not redirect, just show error on the payment page for debugging
-    paymentStatusElem.className = 'error';
-    paymentStatusElem.textContent = 'Payment failed. Check the console for details.';
+    localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
+    window.location.href = 'error.html';
   }
 }
 
@@ -84,6 +81,7 @@ document.getElementById('payment-form').addEventListener('submit', async (e) => 
     paymentStatusElem.className = 'error';
     paymentStatusElem.textContent = `Error: ${err.message}`;
     localStorage.setItem('lastError', err.message || 'Unknown error');
+    window.location.href = 'error.html';
   } finally {
     showLoading(false);
   }
