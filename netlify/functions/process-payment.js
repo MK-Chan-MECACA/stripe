@@ -36,12 +36,22 @@ exports.handler = async (event, context) => {
     });
 
     let status;
+    let paymentIntentId;
+
     if (result && result.payment_intent && result.payment_intent.status) {
       status = result.payment_intent.status;
+      paymentIntentId = result.payment_intent.id;
     } else if (result && result.action && result.action.status) {
       status = result.action.status;
-    } else {
-      status = undefined;
+      if (result.action.process_payment_intent && result.action.process_payment_intent.payment_intent) {
+        paymentIntentId = result.action.process_payment_intent.payment_intent;
+      }
+    }
+
+    // If status is still undefined or in_progress/processing, but we have a paymentIntentId, fetch it from Stripe
+    if ((!status || status === 'in_progress' || status === 'processing') && paymentIntentId) {
+      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+      status = pi.status;
     }
 
     if (status) {
