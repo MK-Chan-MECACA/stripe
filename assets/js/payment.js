@@ -21,7 +21,11 @@ async function pollPaymentStatus(paymentIntentId) {
   let status = 'processing';
   const paymentStatusElem = document.getElementById('payment-status');
   while (status === 'processing') {
-    const res = await fetch(`/.netlify/functions/process-payment?id=${paymentIntentId}`);
+    const res = await fetch('/.netlify/functions/process-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: paymentIntentId })
+    });
     const data = await res.json();
     status = data.status;
     paymentStatusElem.textContent = `Status: ${status}`;
