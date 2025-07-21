@@ -14,11 +14,11 @@ exports.handler = async (event, context) => {
     const body = JSON.parse(event.body);
     const { amount, currency, description, capture_method, metadata } = body;
 
-    // Create PaymentIntent with card_present method
+    // Create PaymentIntent with card method (online payment)
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: currency || 'usd',
-      payment_method_types: ['card_present'],
+      payment_method_types: ['card'],
       capture_method: capture_method || 'automatic',
       description,
       metadata,
