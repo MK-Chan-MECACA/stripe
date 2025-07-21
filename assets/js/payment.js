@@ -47,10 +47,12 @@ function showLoading(show) {
 
 document.getElementById('payment-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const amount = document.getElementById('amount').value;
-  if (!validateAmount(amount)) {
+  // Convert dollars to cents and validate
+  const amountInput = document.getElementById('amount').value;
+  const amount = parseInt(amountInput, 10) * 100;
+  if (!validateAmount(amountInput) || isNaN(amount) || amount < 50) { // Stripe minimum is 50 cents
     paymentStatusElem.className = 'error';
-    paymentStatusElem.textContent = 'Please enter a valid amount.';
+    paymentStatusElem.textContent = 'Please enter a valid amount (minimum $0.50).';
     return;
   }
   showLoading(true);
