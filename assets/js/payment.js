@@ -38,8 +38,11 @@ async function pollPaymentStatus(paymentIntentId) {
   if (status === 'succeeded') {
     window.location.href = 'success.html';
   } else {
-    localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
-    window.location.href = 'error.html';
+    // localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
+    // window.location.href = 'error.html';
+    // Do not redirect, just show error on the payment page for debugging
+    paymentStatusElem.className = 'error';
+    paymentStatusElem.textContent = 'Payment failed. Check the console for details.';
   }
 }
 
