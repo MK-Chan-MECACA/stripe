@@ -4,7 +4,21 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async (event, context) => {
   try {
-    const body = JSON.parse(event.body);
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'No request body provided' }),
+      };
+    }
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Malformed JSON', details: err.message }),
+      };
+    }
     const { payment_intent_id, reader_id } = body;
 
     if (!payment_intent_id || !reader_id) {
