@@ -74,7 +74,9 @@ document.getElementById('payment-form').addEventListener('submit', async (e) => 
   paymentStatusElem.textContent = '';
   paymentStatusElem.className = '';
   try {
-    const { paymentIntentId, error } = await createPaymentIntent(amount);
+    const response = await createPaymentIntent(amount);
+    const paymentIntentId = response.payment_intent && response.payment_intent.id;
+    const error = response.error;
     if (error) throw new Error(error);
     await pollPaymentStatus(paymentIntentId);
   } catch (err) {
