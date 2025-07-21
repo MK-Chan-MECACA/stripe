@@ -16,11 +16,17 @@ async function createPaymentIntent(amount) {
   return response.json();
 }
 
+async function getReaderId() {
+  const res = await fetch('/.netlify/functions/get-reader-id');
+  const data = await res.json();
+  return data.reader_id;
+}
+
 // Real-time payment status updates (example: polling)
 async function pollPaymentStatus(paymentIntentId) {
   let status = 'processing';
   const paymentStatusElem = document.getElementById('payment-status');
-  const readerId = 'tmr_GHqYoAltN8ohZX'; // Hardcoded reader_id
+  const readerId = await getReaderId(); // Fetch reader_id from backend
   while (status === 'processing') {
     const res = await fetch('/.netlify/functions/process-payment', {
       method: 'POST',
