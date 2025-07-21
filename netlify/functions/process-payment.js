@@ -5,6 +5,7 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 exports.handler = async (event, context) => {
   try {
     if (!event.body) {
+      console.error('No request body provided');
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'No request body provided' }),
@@ -14,6 +15,7 @@ exports.handler = async (event, context) => {
     try {
       body = JSON.parse(event.body);
     } catch (err) {
+      console.error('Malformed JSON:', err);
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Malformed JSON', details: err.message }),
@@ -38,9 +40,10 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ result }),
     };
   } catch (err) {
+    console.error('Failed to process payment:', err);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Failed to process payment', details: err.message }),
+      body: JSON.stringify({ error: 'Failed to process payment', details: err.message, stack: err.stack }),
     };
   }
 }; 
