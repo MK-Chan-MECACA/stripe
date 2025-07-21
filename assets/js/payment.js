@@ -27,7 +27,9 @@ async function pollPaymentStatus(paymentIntentId) {
   let status = 'processing';
   const paymentStatusElem = document.getElementById('payment-status');
   const readerId = await getReaderId(); // Fetch reader_id from backend
-  while (status === 'processing') {
+  let pollCount = 0;
+  const maxPolls = 12; // 12 * 5s = 60 seconds
+  while (status === 'processing' || status === 'in_progress') {
     const res = await fetch('/.netlify/functions/process-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,7 +43,9 @@ async function pollPaymentStatus(paymentIntentId) {
     if (status === 'succeeded' || status === 'requires_capture') paymentStatusElem.classList.add('success');
     if (status === 'failed') paymentStatusElem.classList.add('error');
     if (status === 'succeeded' || status === 'failed' || status === 'requires_capture') break;
-    await new Promise(r => setTimeout(r, 2000));
+    pollCount++;
+    if (pollCount >= maxPolls) break;
+    await new Promise(r => setTimeout(r, 5000)); // 5 seconds
   }
   if (status === 'succeeded' || status === 'requires_capture') {
     window.location.href = 'success.html';
