@@ -49,9 +49,13 @@ async function pollPaymentStatus(paymentIntentId) {
   }
   if (status === 'succeeded' || status === 'requires_capture') {
     window.location.href = 'success.html';
-  } else {
+  } else if (status === 'requires_payment_method' || status === 'failed' || status === 'canceled') {
     localStorage.setItem('lastError', paymentStatusElem.textContent || 'Unknown error');
     window.location.href = 'error.html';
+  } else {
+    // For processing/in_progress/unknown, show a message and do NOT redirect
+    paymentStatusElem.className = 'error';
+    paymentStatusElem.textContent = 'Payment is still processing. Please check the terminal or try again.';
   }
 }
 
