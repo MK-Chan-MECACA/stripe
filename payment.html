@@ -135,12 +135,12 @@
       transform: translateY(-50%);
       color: #6b7280;
       font-weight: 600;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
     }
     
     input {
       width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
+      padding: 1rem 1rem 1rem 3.5rem;
       border: 2px solid #e5e7eb;
       border-radius: 12px;
       font-size: 1.25rem;
@@ -154,6 +154,13 @@
       border-color: #6366f1;
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
       transform: translateY(-1px);
+    }
+    
+    .input-helper {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
     }
     
     .btn {
@@ -301,17 +308,19 @@
         <div class="form-group">
           <label for="amount">💰 Payment Amount</label>
           <div class="input-wrapper">
-            <span class="currency-symbol">$</span>
+            <span class="currency-symbol">RM</span>
             <input 
-              type="number" 
+              type="text" 
               id="amount" 
               name="amount" 
-              step="0.01" 
-              min="0.50"
               placeholder="10.00"
+              inputmode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              autocomplete="off"
               required
             >
           </div>
+          <p class="input-helper">Enter amount (e.g., 10.50 or 25)</p>
         </div>
         
         <button type="submit" id="pay-button" class="btn">
@@ -333,6 +342,53 @@
 
     let processing = false;
 
+    // Enhanced mobile input handling for decimal amounts
+    function handleAmountInput(e) {
+      let value = e.target.value;
+      
+      // Remove any non-numeric characters except decimal point
+      value = value.replace(/[^0-9.]/g, '');
+      
+      // Ensure only one decimal point
+      const parts = value.split('.');
+      if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+      }
+      
+      // Limit to 2 decimal places
+      if (parts[1] && parts[1].length > 2) {
+        value = parts[0] + '.' + parts[1].slice(0, 2);
+      }
+      
+      e.target.value = value;
+      
+      // Update helper text based on input
+      updateHelperText(value);
+    }
+    
+    function updateHelperText(value) {
+      const helper = document.querySelector('.input-helper');
+      if (!value) {
+        helper.textContent = 'Enter amount (e.g., 10.50 or 25)';
+        helper.style.color = '#6b7280';
+      } else {
+        const num = parseFloat(value);
+        if (isNaN(num)) {
+          helper.textContent = 'Please enter a valid amount';
+          helper.style.color = '#dc2626';
+        } else if (num < 0.50) {
+          helper.textContent = 'Minimum amount is RM0.50';
+          helper.style.color = '#f59e0b';
+        } else {
+          helper.textContent = `Amount: RM${parseFloat(value).toFixed(2)}`;
+          helper.style.color = '#059669';
+        }
+      }
+    }
+
+    // Add smart input formatting for mobile
+    amountInput.addEventListener('input', handleAmountInput);
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -341,7 +397,7 @@
       const amount = parseFloat(amountInput.value);
       
       if (!amount || amount < 0.50) {
-        showStatus('Please enter an amount of at least $0.50', 'error');
+        showStatus('Please enter an amount of at least RM0.50', 'error');
         return;
       }
 
