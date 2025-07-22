@@ -1,5 +1,4 @@
 [build]
-  publish = "."
   functions = "netlify/functions"
   command = "npm run build"
 
@@ -9,20 +8,4 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
-  status = 200
-
-# Ensure proper function routing
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# Handle SPA routing (optional, but good for future)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {path = "!/.netlify/*"}
-  conditions = {path = "!/api/*"}
-  conditions = {path = "!/assets/*"}
-  conditions = {path = "!/*.html"} 
+  status = 200 
