@@ -4,7 +4,7 @@
   "description": "Stripe Terminal payment processing app with BBPOS WisePOS E integration",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'Static site - no build needed'",
+    "build": "npm install",
     "dev": "netlify dev",
     "start": "netlify dev"
   },

@@ -9,6 +9,18 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
+  // Handle CORS preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      },
+    };
+  }
+
   try {
     // Create Stripe Terminal connection token - this is the main purpose
     const connectionToken = await stripe.terminal.connectionTokens.create();
@@ -45,6 +57,12 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      },
       body: JSON.stringify({
         secret: connectionToken.secret,
         reader_status: readerStatus,
@@ -54,6 +72,12 @@ exports.handler = async (event, context) => {
     console.error('Connection token creation failed:', err);
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      },
       body: JSON.stringify({ error: 'Failed to create connection token', details: err.message }),
     };
   }
