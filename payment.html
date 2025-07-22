@@ -5,150 +5,323 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Process Payment - Stripe Terminal</title>
   <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-      background: #f8fafc;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .card {
-      background: white;
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: white;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .back-link {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      margin-bottom: 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      background: rgba(255,255,255,0.1);
+      padding: 0.75rem 1.5rem;
       border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      transform: translateX(-2px);
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .instructions {
+      background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
       padding: 2rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      border-radius: 16px;
+      border-left: 5px solid #0ea5e9;
       margin-bottom: 2rem;
     }
-    .form-group {
-      margin-bottom: 1.5rem;
+    
+    .instructions h3 {
+      color: #1f2937;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
+    
+    .instruction-steps {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    
+    .instruction-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       color: #374151;
     }
+    
+    .step-number {
+      background: #0ea5e9;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 2rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 1.1rem;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    .currency-symbol {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
     input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 1rem 1rem 1rem 3rem;
       border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      transition: border-color 0.2s;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background: white;
     }
+    
     input:focus {
       outline: none;
-      border-color: #2563eb;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      transform: translateY(-1px);
     }
+    
     .btn {
       width: 100%;
-      background: #2563eb;
+      background: linear-gradient(135deg, #10b981, #059669);
       color: white;
       border: none;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.25rem 2rem;
+      border-radius: 16px;
       font-size: 1.1rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
     }
+    
     .btn:hover:not(:disabled) {
-      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
     }
+    
     .btn:disabled {
-      background: #9ca3af;
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
+    
     .status {
-      padding: 1rem;
-      border-radius: 8px;
-      margin: 1rem 0;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
       font-weight: 500;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
     }
+    
     .status.success {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #bbf7d0;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
     }
+    
     .status.processing {
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fed7aa;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
+    
     .status.error {
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fca5a5;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
     }
+    
     .spinner {
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #2563eb;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       animation: spin 1s linear infinite;
-      display: inline-block;
-      margin-right: 10px;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .back-link {
-      color: #2563eb;
-      text-decoration: none;
-      margin-bottom: 2rem;
-      display: inline-block;
+    
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 1rem;
     }
-    h1 {
-      color: #1f2937;
-      text-align: center;
-      margin-bottom: 2rem;
+    
+    .progress-fill {
+      height: 100%;
+      background: white;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 2px;
     }
-    .instructions {
-      background: #f1f5f9;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border-left: 4px solid #2563eb;
-      margin-bottom: 2rem;
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+      
+      .instructions {
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <a href="index.html" class="back-link">← Back to Home</a>
-  
-  <h1>💳 Process Payment</h1>
-  
-  <div class="card">
-    <div class="instructions">
-      <strong>How it works:</strong><br>
-      1. Enter the payment amount below<br>
-      2. Click "Process Payment"<br>
-      3. Follow prompts on your BBPOS terminal<br>
-      4. Insert, tap, or swipe the customer's card
+  <div class="container">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span>Back to Home</span>
+    </a>
+    
+    <div class="header">
+      <h1>💳 Process Payment</h1>
     </div>
-
-    <form id="payment-form">
-      <div class="form-group">
-        <label for="amount">Payment Amount ($)</label>
-        <input 
-          type="number" 
-          id="amount" 
-          name="amount" 
-          step="0.01" 
-          min="0.50"
-          placeholder="10.00"
-          required
-        >
+    
+    <div class="card">
+      <div class="instructions">
+        <h3>📋 Payment Process</h3>
+        <div class="instruction-steps">
+          <div class="instruction-step">
+            <div class="step-number">1</div>
+            <span>Enter the payment amount below</span>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">2</div>
+            <span>Click "Process Payment" to initiate</span>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">3</div>
+            <span>Follow prompts on your BBPOS terminal</span>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">4</div>
+            <span>Insert, tap, or swipe the customer's card</span>
+          </div>
+        </div>
       </div>
-      
-      <button type="submit" id="pay-button" class="btn">
-        Process Payment
-      </button>
-    </form>
 
-    <div id="payment-status" class="status" style="display: none;"></div>
+      <form id="payment-form">
+        <div class="form-group">
+          <label for="amount">💰 Payment Amount</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input 
+              type="number" 
+              id="amount" 
+              name="amount" 
+              step="0.01" 
+              min="0.50"
+              placeholder="10.00"
+              required
+            >
+          </div>
+        </div>
+        
+        <button type="submit" id="pay-button" class="btn">
+          <span>Process Payment</span>
+          <span>⚡</span>
+        </button>
+      </form>
+
+      <div id="payment-status" class="status" style="display: none;"></div>
+    </div>
   </div>
 
   <script>
@@ -178,7 +351,7 @@
     async function processPayment(amount) {
       processing = true;
       payButton.disabled = true;
-      payButton.innerHTML = '<span class="spinner"></span>Processing...';
+      payButton.innerHTML = '<div class="spinner"></div><span>Processing...</span>';
       
       try {
         showStatus('Creating payment...', 'processing');
@@ -227,7 +400,7 @@
       } finally {
         processing = false;
         payButton.disabled = false;
-        payButton.innerHTML = 'Process Payment';
+        payButton.innerHTML = '<span>Process Payment</span><span>⚡</span>';
       }
     }
 

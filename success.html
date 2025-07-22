@@ -5,114 +5,353 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Payment Successful - Stripe Terminal</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-      background: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
       text-align: center;
+      position: relative;
+      overflow-x: hidden;
     }
+    
+    /* Floating celebration elements */
+    .celebration-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .celebration-bg::before,
+    .celebration-bg::after {
+      content: '🎉';
+      position: absolute;
+      font-size: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .celebration-bg::before {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .celebration-bg::after {
+      top: 30%;
+      right: 15%;
+      animation-delay: 1s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
     .card {
-      background: white;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
       padding: 3rem 2rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
-      animation: slideIn 0.5s ease-out;
+      animation: celebrateIn 0.8s ease-out;
+      border: 1px solid rgba(255,255,255,0.3);
     }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    
+    @keyframes celebrateIn {
+      0% { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.9); 
+      }
+      50% { 
+        transform: translateY(-10px) scale(1.05); 
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+      }
     }
+    
     .success-icon {
-      font-size: 5rem;
-      color: #10b981;
-      margin-bottom: 1rem;
-      animation: bounce 1s ease-out;
+      font-size: 6rem;
+      margin-bottom: 1.5rem;
+      animation: successBounce 1.2s ease-out;
+      background: linear-gradient(135deg, #10b981, #059669);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
+    
+    @keyframes successBounce {
+      0% { 
+        transform: scale(0) rotate(-180deg); 
+        opacity: 0; 
+      }
+      50% { 
+        transform: scale(1.2) rotate(-90deg); 
+        opacity: 0.8; 
+      }
+      100% { 
+        transform: scale(1) rotate(0deg); 
+        opacity: 1; 
+      }
     }
+    
     h1 {
-      color: #10b981;
+      background: linear-gradient(135deg, #10b981, #059669);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 1rem;
-      font-size: 2.5rem;
+      font-size: 3rem;
+      font-weight: 800;
+      animation: slideInUp 0.6s ease-out 0.3s both;
     }
-    p {
-      color: #6b7280;
-      font-size: 1.2rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
+    
+    @keyframes slideInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
     }
-    .btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      margin: 0.5rem;
-      transition: all 0.2s;
-      min-width: 180px;
-    }
-    .btn:hover {
-      background: #1d4ed8;
-      transform: translateY(-2px);
-    }
-    .btn.secondary {
-      background: #6b7280;
-    }
-    .btn.secondary:hover {
-      background: #4b5563;
-    }
-    .details {
-      background: #f0fdf4;
-      padding: 2rem;
-      border-radius: 12px;
-      margin: 2rem 0;
-      text-align: left;
-      border: 2px solid #bbf7d0;
-    }
-    .details strong {
-      color: #059669;
-    }
+    
     .celebration {
       font-size: 1.5rem;
       margin: 1rem 0;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+      animation: slideInUp 0.6s ease-out 0.4s both;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      animation: slideInUp 0.6s ease-out 0.5s both;
+    }
+    
+    .details {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      padding: 2.5rem;
+      border-radius: 20px;
+      margin: 2.5rem 0;
+      text-align: left;
+      border: 2px solid #bbf7d0;
+      animation: slideInUp 0.6s ease-out 0.6s both;
+    }
+    
+    .details h3 {
+      color: #059669;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .detail-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .detail-value {
+      font-weight: 500;
+      color: #059669;
+    }
+    
+    .actions {
+      margin-top: 2.5rem;
+      animation: slideInUp 0.6s ease-out 0.7s both;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 1.25rem 2.5rem;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0.75rem;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn.secondary {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3);
+    }
+    
+    .btn.secondary:hover {
+      box-shadow: 0 15px 35px rgba(107, 114, 128, 0.4);
+    }
+    
+    .footer-info {
+      margin-top: 2.5rem;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+      animation: slideInUp 0.6s ease-out 0.8s both;
+      background: rgba(255,255,255,0.1);
+      padding: 1.5rem;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .footer-info a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    
+    .footer-info a:hover {
+      color: white;
+    }
+    
+    /* Confetti animation */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      left: 50%;
+      width: 2px;
+      height: 2px;
+      background: #f59e0b;
+      animation: confetti-fall 3s linear infinite;
+      z-index: 1000;
+    }
+    
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .card {
+        padding: 2rem 1.5rem;
+      }
+      
+      .success-icon {
+        font-size: 5rem;
+      }
+      
+      .btn {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="success-icon">🎉</div>
-    <h1>Payment Successful!</h1>
-    <div class="celebration">✨ Transaction Completed ✨</div>
-    <p>Your payment has been processed successfully on your BBPOS WisePOS E terminal. The transaction is complete and secure.</p>
-    
-    <div class="details">
-      <strong>📋 Transaction Details:</strong><br><br>
-      <strong>✅ Status:</strong> Successfully Processed<br>
-      <strong>💳 Method:</strong> Card Present (Terminal)<br>
-      <strong>🏪 Terminal:</strong> BBPOS WisePOS E<br>
-      <strong>🔒 Security:</strong> EMV Chip Verified<br>
-      <strong>⏰ Completed:</strong> <span id="timestamp"></span>
-    </div>
+  <div class="celebration-bg"></div>
+  
+  <div class="container">
+    <div class="card">
+      <div class="success-icon">🎉</div>
+      <h1>Payment Successful!</h1>
+      <div class="celebration">✨ Transaction Completed ✨</div>
+      <p class="subtitle">Your payment has been processed successfully on your BBPOS WisePOS E terminal. The transaction is complete and secure.</p>
+      
+      <div class="details">
+        <h3>📋 Transaction Details</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">✅ Status</span>
+            <span class="detail-value">Successfully Processed</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">💳 Method</span>
+            <span class="detail-value">Card Present (Terminal)</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">🏪 Terminal</span>
+            <span class="detail-value">BBPOS WisePOS E</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">🔒 Security</span>
+            <span class="detail-value">EMV Chip Verified</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">⏰ Completed</span>
+            <span class="detail-value" id="timestamp"></span>
+          </div>
+        </div>
+      </div>
 
-    <div style="margin-top: 2rem;">
-      <a href="payment.html" class="btn">Process Another Payment</a><br>
-      <a href="index.html" class="btn secondary" style="margin-top: 1rem;">Back to Home</a>
-    </div>
-    
-    <div style="margin-top: 2rem; color: #6b7280; font-size: 0.9rem;">
-      <p>Receipt details have been sent to your terminal.<br>
-      You can also view transaction details in your <a href="https://dashboard.stripe.com/test/payments" target="_blank" style="color: #2563eb;">Stripe Dashboard</a>.</p>
+      <div class="actions">
+        <a href="payment.html" class="btn">
+          <span>Process Another Payment</span>
+          <span>💳</span>
+        </a>
+        <a href="index.html" class="btn secondary">
+          <span>Back to Home</span>
+          <span>🏠</span>
+        </a>
+      </div>
+      
+      <div class="footer-info">
+        <p>Receipt details have been sent to your terminal.<br>
+        You can also view transaction details in your <a href="https://dashboard.stripe.com/test/payments" target="_blank">Stripe Dashboard</a>.</p>
+      </div>
     </div>
   </div>
 

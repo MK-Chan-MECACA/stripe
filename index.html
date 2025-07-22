@@ -5,100 +5,307 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stripe Terminal Payment</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 800px;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    
+    .container {
+      max-width: 900px;
       margin: 0 auto;
-      padding: 2rem;
-      background: #f8fafc;
     }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: white;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+    
     .card {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
+      border: 1px solid rgba(255,255,255,0.2);
     }
+    
+    .card h2 {
+      color: #1f2937;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
     .status {
-      padding: 1rem;
-      border-radius: 8px;
-      margin: 1rem 0;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
     }
+    
     .status.connected {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #bbf7d0;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
     }
+    
     .status.connecting {
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fed7aa;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
+    
     .status.error {
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fca5a5;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
     }
+    
+    .status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .terminal-info {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 2rem;
+      border-radius: 16px;
+      border-left: 5px solid #6366f1;
+      margin: 1.5rem 0;
+    }
+    
+    .terminal-info .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .info-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .info-value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .feature {
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #0ea5e9;
+      transition: transform 0.2s ease;
+    }
+    
+    .feature:hover {
+      transform: translateY(-2px);
+    }
+    
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feature-title {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.25rem;
+    }
+    
+    .feature-desc {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
     .btn {
-      background: #2563eb;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: white;
       border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
+      padding: 1.25rem 2.5rem;
+      border-radius: 16px;
       font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
       text-decoration: none;
-      display: inline-block;
-      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+      width: 100%;
     }
+    
     .btn:hover {
-      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
     }
+    
     .btn:disabled {
-      background: #9ca3af;
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
-    h1 {
-      color: #1f2937;
-      text-align: center;
+    
+    .pulse-ring {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 3px solid currentColor;
+      border-radius: 50%;
+      animation: pulse-ring 1.5s infinite;
     }
-    .terminal-info {
-      background: #f1f5f9;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border-left: 4px solid #2563eb;
+    
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .features {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🏪 Stripe Terminal Payment Demo</h1>
-  
-  <div class="card">
-    <h2>Terminal Status</h2>
-    <div id="terminal-status" class="status connecting">
-      Connecting to terminal...
+  <div class="container">
+    <div class="header">
+      <h1>💳 Stripe Terminal</h1>
+      <p class="subtitle">Secure payment processing with BBPOS WisePOS E</p>
     </div>
-    <div class="terminal-info">
-      <strong>Terminal:</strong> BBPOS WisePOS E<br>
-      <strong>Connection:</strong> WiFi<br>
-      <strong>Location:</strong> <span id="location-id">Loading...</span>
+    
+    <div class="card">
+      <h2>🔌 Terminal Status</h2>
+      <div id="terminal-status" class="status connecting">
+        <div class="pulse-ring"></div>
+        Connecting to terminal...
+      </div>
+      <div class="terminal-info">
+        <h3 style="margin-bottom: 1rem; color: #1f2937;">Terminal Configuration</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Device</span>
+            <span class="info-value">BBPOS WisePOS E</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Connection</span>
+            <span class="info-value">WiFi Network</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Location ID</span>
+            <span class="info-value" id="location-id">Loading...</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>Payment Processing</h2>
-    <p>Your BBPOS WisePOS E terminal is configured for secure card payments including:</p>
-    <ul>
-      <li>✅ Chip & PIN transactions</li>
-      <li>✅ Contactless (NFC) payments</li>
-      <li>✅ Magnetic stripe fallback</li>
-      <li>✅ Real-time processing</li>
-    </ul>
-    <br>
-    <a href="payment.html" id="start-payment" class="btn" style="text-align: center; width: 100%;">
-      Start Payment →
-    </a>
+    <div class="card">
+      <h2>💰 Payment Features</h2>
+      <p style="color: #6b7280; margin-bottom: 2rem;">Your terminal supports multiple payment methods for secure transactions</p>
+      
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">💳</div>
+          <div class="feature-title">Chip & PIN</div>
+          <div class="feature-desc">Secure EMV chip card transactions with PIN verification</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">Contactless (NFC)</div>
+          <div class="feature-desc">Tap to pay with cards, phones, and wearables</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">💳</div>
+          <div class="feature-title">Magnetic Stripe</div>
+          <div class="feature-desc">Fallback support for legacy payment cards</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Real-time Processing</div>
+          <div class="feature-desc">Instant payment processing and confirmation</div>
+        </div>
+      </div>
+      
+      <a href="payment.html" id="start-payment" class="btn">
+        <span>Start Payment</span>
+        <span>→</span>
+      </a>
+    </div>
   </div>
 
   <script>
@@ -130,9 +337,9 @@
         if (response.ok) {
           const data = await response.json();
           if (data.secret) {
-            statusEl.textContent = '✅ Terminal Ready';
+            statusEl.innerHTML = '<div class="pulse-ring"></div>✅ Terminal Ready';
             statusEl.className = 'status connected';
-            paymentBtn.style.display = 'block';
+            paymentBtn.style.display = 'flex';
             connected = true;
           }
         } else {
@@ -140,7 +347,7 @@
         }
       } catch (error) {
         console.log('Terminal connection check failed:', error);
-        statusEl.textContent = '❌ Terminal Connection Error';
+        statusEl.innerHTML = '<div class="pulse-ring"></div>❌ Terminal Connection Error';
         statusEl.className = 'status error';
         paymentBtn.style.display = 'none';
         
