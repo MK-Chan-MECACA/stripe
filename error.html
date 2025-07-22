@@ -3,28 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Error</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Payment Error - Stripe Terminal</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f8fafc;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      margin-bottom: 2rem;
+      animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .error-icon {
+      font-size: 4rem;
+      color: #dc2626;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      color: #dc2626;
+      margin-bottom: 1rem;
+      font-size: 2.2rem;
+    }
+    p {
+      color: #6b7280;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.5rem;
+      transition: all 0.2s;
+      min-width: 150px;
+    }
+    .btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+    .btn.secondary {
+      background: #6b7280;
+    }
+    .btn.secondary:hover {
+      background: #4b5563;
+    }
+    .btn.retry {
+      background: #059669;
+    }
+    .btn.retry:hover {
+      background: #047857;
+    }
+    .error-details {
+      background: #fef2f2;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid #fca5a5;
+      margin: 2rem 0;
+      text-align: left;
+    }
+    .error-message {
+      color: #dc2626;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .help-section {
+      background: #f8fafc;
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      text-align: left;
+      border-left: 4px solid #2563eb;
+    }
+    .help-text {
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .troubleshoot-item {
+      margin: 1rem 0;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
+    }
+    .support-info {
+      background: #fffbeb;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #fed7aa;
+      margin: 2rem 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Oops! Something went wrong.</h1>
-  <div id="error-log" style="color: #ef4444; margin: 1em 0;"></div>
-  <a href="index.html">Back to Home</a>
-  <button id="try-again" style="margin-left: 1em; padding: 0.5em 1em; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Try Again</button>
+  <div class="card">
+    <div class="error-icon">⚠️</div>
+    <h1>Payment Issue</h1>
+    <p>There was an issue processing your payment. Don't worry - your card was not charged if the payment failed.</p>
+    
+    <div class="error-details">
+      <div class="error-message" id="error-message">
+        Payment could not be completed
+      </div>
+      <div id="error-timestamp" style="color: #6b7280; font-size: 0.9rem;"></div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-text">
+        <strong style="color: #1f2937;">🔧 Quick Solutions:</strong><br><br>
+        
+        <div class="troubleshoot-item">
+          <strong>💳 Card Issues:</strong> Try a different card or ensure chip/contactless is working
+        </div>
+        
+        <div class="troubleshoot-item">
+          <strong>🏪 Terminal:</strong> Check that BBPOS terminal is connected and ready
+        </div>
+        
+        <div class="troubleshoot-item">
+          <strong>📶 Connection:</strong> Verify WiFi connection on terminal
+        </div>
+        
+        <div class="troubleshoot-item">
+          <strong>💰 Amount:</strong> Ensure amount is at least $0.50
+        </div>
+      </div>
+    </div>
+
+    <div style="margin: 2rem 0;">
+      <a href="payment.html" class="btn retry">🔄 Try Again</a><br>
+      <a href="index.html" class="btn secondary" style="margin-top: 1rem;">🏠 Back to Home</a>
+    </div>
+
+    <div class="support-info">
+      <strong style="color: #92400e;">📞 Need Help?</strong><br>
+      <div style="color: #6b7280; margin-top: 0.5rem; font-size: 0.9rem;">
+        • Check your <a href="https://dashboard.stripe.com/test/payments" target="_blank" style="color: #2563eb;">Stripe Dashboard</a> for transaction status<br>
+        • Verify terminal connection and try processing again<br>
+        • Contact support if the issue persists
+      </div>
+    </div>
+  </div>
+
   <script>
-    const logElem = document.getElementById('error-log');
+    // Show error message from localStorage if available
     const lastError = localStorage.getItem('lastError');
     if (lastError) {
-      if (lastError.includes('requires_payment_method')) {
-        logElem.textContent = 'No valid card was presented or the card was declined. Please try again with a valid card.';
-      } else {
-        logElem.textContent = lastError;
-      }
+      document.getElementById('error-message').textContent = lastError;
       localStorage.removeItem('lastError');
     }
-    document.getElementById('try-again').onclick = function() {
-      window.location.href = 'payment.html';
-    };
+
+    // Show timestamp
+    document.getElementById('error-timestamp').textContent = `Occurred: ${new Date().toLocaleString()}`;
+    
+    // Auto-scroll to top and focus
+    document.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+    });
+
+    // Optional: Add retry with delay
+    let retryButton = document.querySelector('.btn.retry');
+    retryButton.addEventListener('click', function(e) {
+      this.innerHTML = '⏳ Redirecting...';
+      this.disabled = true;
+    });
   </script>
 </body>
-</html> 
+</html>

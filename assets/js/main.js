@@ -1,7 +1,18 @@
 // Initialize Supabase client
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase = null;
+
+async function initializeSupabase() {
+  try {
+    const response = await fetch('/.netlify/functions/get-supabase-config');
+    const config = await response.json();
+    if (config.url && config.anonKey) {
+      const { createClient } = window.supabase;
+      supabase = createClient(config.url, config.anonKey);
+    }
+  } catch (error) {
+    console.warn('Could not initialize Supabase:', error);
+  }
+}
 
 const statusElem = document.getElementById('reader-status');
 const dotElem = document.getElementById('reader-dot');
@@ -12,17 +23,26 @@ function setReaderStatus(status) {
 }
 
 async function checkReaderStatus() {
-  // Example: fetch from a Netlify function or Supabase table
-  const { data, error } = await supabase
-    .from('readers')
-    .select('status')
-    .eq('id', 1)
-    .single();
-
-  if (error || !data) {
+  if (!supabase) {
     setReaderStatus('unknown');
-  } else {
-    setReaderStatus(data.status);
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('readers')
+      .select('status')
+      .eq('id', 1)
+      .single();
+
+    if (error || !data) {
+      setReaderStatus('unknown');
+    } else {
+      setReaderStatus(data.status);
+    }
+  } catch (error) {
+    console.warn('Error checking reader status:', error);
+    setReaderStatus('unknown');
   }
 }
 
@@ -30,6 +50,7 @@ document.getElementById('start-payment-btn').addEventListener('click', () => {
   window.location.href = 'payment.html';
 });
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await initializeSupabase();
   checkReaderStatus();
 }); 
