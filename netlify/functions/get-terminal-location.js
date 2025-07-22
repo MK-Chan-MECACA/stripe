@@ -1,4 +1,4 @@
-// get-reader-id.js - Netlify Function to expose STRIPE_READER_ID
+// get-terminal-location.js - Netlify Function to expose STRIPE_TERMINAL_LOCATION_ID
 exports.handler = async function() {
   return {
     statusCode: 200,
@@ -7,7 +7,7 @@ exports.handler = async function() {
       'Access-Control-Allow-Origin': '*',
     },
     body: JSON.stringify({ 
-      reader_id: process.env.STRIPE_READER_ID 
+      location_id: process.env.STRIPE_TERMINAL_LOCATION_ID 
     })
   };
-}; 
+};

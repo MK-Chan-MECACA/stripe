@@ -54,9 +54,14 @@ async function discoverReaders() {
   }
 
   try {
+    // Get location ID from backend
+    const locationResponse = await fetch('/.netlify/functions/get-terminal-location');
+    const locationData = await locationResponse.json();
+    const locationId = locationData.location_id || null;
+    
     const discoverResult = await terminal.discoverReaders({
       simulated: false, // Set to true for testing
-      location: 'tml_GHqYagPZrZxRFf' // Your terminal location ID
+      location: locationId
     });
 
     if (discoverResult.error) {

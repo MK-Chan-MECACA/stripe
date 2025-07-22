@@ -82,7 +82,7 @@
     <div class="terminal-info">
       <strong>Terminal:</strong> BBPOS WisePOS E<br>
       <strong>Connection:</strong> WiFi<br>
-      <strong>Location:</strong> tml_GHqYagPZrZxRFf
+      <strong>Location:</strong> <span id="location-id">Loading...</span>
     </div>
   </div>
 
@@ -104,6 +104,16 @@
   <script>
     // Simple terminal status check
     let connected = false;
+    
+    async function loadTerminalInfo() {
+      try {
+        const locationResponse = await fetch('/.netlify/functions/get-terminal-location');
+        const locationData = await locationResponse.json();
+        document.getElementById('location-id').textContent = locationData.location_id || 'Not configured';
+      } catch (error) {
+        document.getElementById('location-id').textContent = 'Error loading';
+      }
+    }
     
     async function checkTerminalStatus() {
       const statusEl = document.getElementById('terminal-status');
@@ -141,6 +151,7 @@
     
     // Check status on page load
     checkTerminalStatus();
+    loadTerminalInfo();
     
     // Recheck every 30 seconds
     setInterval(checkTerminalStatus, 30000);

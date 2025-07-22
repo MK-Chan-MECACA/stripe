@@ -245,12 +245,13 @@
 
     async function processOnTerminal(paymentIntentId) {
       try {
+        const readerId = await getReaderId();
         const response = await fetch('/.netlify/functions/collect-payment-method', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             payment_intent_id: paymentIntentId, 
-            reader_id: 'tmr_GHqYoAltN8ohZX'
+            reader_id: readerId
           })
         });
         
@@ -300,6 +301,17 @@
       statusDiv.textContent = message;
       statusDiv.className = `status ${type}`;
       statusDiv.style.display = 'block';
+    }
+
+    async function getReaderId() {
+      try {
+        const res = await fetch('/.netlify/functions/get-reader-id');
+        const data = await res.json();
+        return data.reader_id;
+      } catch (error) {
+        console.error('Failed to get reader ID:', error);
+        return null; // Return null if unable to get reader ID
+      }
     }
 
     function showManualVerification(paymentIntentId) {
