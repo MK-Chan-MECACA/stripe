@@ -341,42 +341,54 @@
     const amountInput = document.getElementById('amount');
 
     let processing = false;
+    let rawDigits = ''; // Track raw digits separately
 
     // Enhanced mobile input handling - automatic cents conversion
     function handleAmountInput(e) {
-      let value = e.target.value;
+      const inputType = e.inputType;
       
-      // Remove any non-numeric characters to get clean digits
-      value = value.replace(/[^0-9]/g, '');
-      
-      // Limit to reasonable length (10 digits = max RM99,999,999.99)
-      if (value.length > 10) {
-        value = value.slice(0, 10);
+      if (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') {
+        // Handle backspace/delete - remove last digit
+        rawDigits = rawDigits.slice(0, -1);
+      } else {
+        // Handle regular input - extract only new digits
+        const newInput = e.target.value.replace(/[^0-9]/g, '');
+        
+        // If user typed new digits, append them
+        if (newInput.length > rawDigits.length) {
+          const newDigits = newInput.slice(rawDigits.length);
+          rawDigits += newDigits;
+        } else if (newInput !== rawDigits.replace(/[^0-9]/g, '')) {
+          // If completely different, use the new input
+          rawDigits = newInput;
+        }
       }
       
-      // Convert to display format (divide by 100 for cents)
+      // Limit to reasonable length (10 digits = max RM99,999,999.99)
+      if (rawDigits.length > 10) {
+        rawDigits = rawDigits.slice(0, 10);
+      }
+      
+      // Convert raw digits to display format
       let displayValue = '';
-      if (value.length === 0) {
+      if (rawDigits.length === 0) {
         displayValue = '';
-      } else if (value.length === 1) {
-        displayValue = '0.0' + value;
-      } else if (value.length === 2) {
-        displayValue = '0.' + value;
+      } else if (rawDigits.length === 1) {
+        displayValue = '0.0' + rawDigits;
+      } else if (rawDigits.length === 2) {
+        displayValue = '0.' + rawDigits;
       } else {
-        const dollars = value.slice(0, -2);
-        const cents = value.slice(-2);
+        const dollars = rawDigits.slice(0, -2);
+        const cents = rawDigits.slice(-2);
         displayValue = dollars + '.' + cents;
       }
       
-      // Only update if the display value is different to prevent infinite loops
-      if (e.target.value !== displayValue) {
-        // Store the raw numeric value for processing
-        e.target.dataset.rawValue = value;
-        e.target.value = displayValue;
-        
-        // Update helper text based on input
-        updateHelperText(displayValue, value);
-      }
+      // Store the raw numeric value and update display
+      e.target.dataset.rawValue = rawDigits;
+      e.target.value = displayValue;
+      
+      // Update helper text
+      updateHelperText(displayValue, rawDigits);
     }
     
     function updateHelperText(displayValue, rawValue) {
