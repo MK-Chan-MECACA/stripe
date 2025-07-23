@@ -423,10 +423,9 @@
       
       if (processing) return;
       
-      // Get the actual amount from the formatted display value
+      // Get the actual amount from the raw value (in cents)
       const displayValue = amountInput.value;
       const rawValue = amountInput.dataset.rawValue || '';
-      const amount = parseFloat(displayValue);
       const cents = parseInt(rawValue) || 0;
       
       if (!displayValue || cents < 50) {
@@ -445,8 +444,8 @@
       try {
         showStatus('Creating payment...', 'processing');
         
-        // Step 1: Create PaymentIntent
-        const amountCents = Math.round(amount * 100);
+        // Step 1: Create PaymentIntent (cents already calculated from raw input)
+        const amountCents = cents;
         const paymentIntent = await createPaymentIntent(amountCents);
         
         if (!paymentIntent || !paymentIntent.id) {
