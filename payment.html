@@ -313,14 +313,14 @@
               type="text" 
               id="amount" 
               name="amount" 
-              placeholder="10.00"
-              inputmode="decimal"
-              pattern="[0-9]*\.?[0-9]*"
+              placeholder="0.00"
+              inputmode="numeric"
+              pattern="[0-9]*"
               autocomplete="off"
               required
             >
           </div>
-          <p class="input-helper">Enter amount (e.g., 10.50 or 25)</p>
+          <p class="input-helper">Type digits (e.g., 1234 for RM12.34)</p>
         </div>
         
         <button type="submit" id="pay-button" class="btn">
@@ -342,45 +342,54 @@
 
     let processing = false;
 
-    // Enhanced mobile input handling for decimal amounts
+    // Enhanced mobile input handling - automatic cents conversion
     function handleAmountInput(e) {
       let value = e.target.value;
       
-      // Remove any non-numeric characters except decimal point
-      value = value.replace(/[^0-9.]/g, '');
+      // Remove any non-numeric characters
+      value = value.replace(/[^0-9]/g, '');
       
-      // Ensure only one decimal point
-      const parts = value.split('.');
-      if (parts.length > 2) {
-        value = parts[0] + '.' + parts.slice(1).join('');
+      // Limit to reasonable length (10 digits = max RM99,999,999.99)
+      if (value.length > 10) {
+        value = value.slice(0, 10);
       }
       
-      // Limit to 2 decimal places
-      if (parts[1] && parts[1].length > 2) {
-        value = parts[0] + '.' + parts[1].slice(0, 2);
+      // Convert to display format (divide by 100 for cents)
+      let displayValue = '';
+      if (value.length === 0) {
+        displayValue = '';
+      } else if (value.length === 1) {
+        displayValue = '0.0' + value;
+      } else if (value.length === 2) {
+        displayValue = '0.' + value;
+      } else {
+        const dollars = value.slice(0, -2);
+        const cents = value.slice(-2);
+        displayValue = dollars + '.' + cents;
       }
       
-      e.target.value = value;
+      // Store the raw numeric value for processing
+      e.target.dataset.rawValue = value;
+      e.target.value = displayValue;
       
       // Update helper text based on input
-      updateHelperText(value);
+      updateHelperText(displayValue, value);
     }
     
-    function updateHelperText(value) {
+    function updateHelperText(displayValue, rawValue) {
       const helper = document.querySelector('.input-helper');
-      if (!value) {
-        helper.textContent = 'Enter amount (e.g., 10.50 or 25)';
+      if (!displayValue) {
+        helper.textContent = 'Type digits (e.g., 1234 for RM12.34)';
         helper.style.color = '#6b7280';
       } else {
-        const num = parseFloat(value);
-        if (isNaN(num)) {
-          helper.textContent = 'Please enter a valid amount';
-          helper.style.color = '#dc2626';
-        } else if (num < 0.50) {
-          helper.textContent = 'Minimum amount is RM0.50';
+        const num = parseFloat(displayValue);
+        const cents = parseInt(rawValue) || 0;
+        
+        if (cents < 50) {
+          helper.textContent = 'Minimum amount is RM0.50 (type 50)';
           helper.style.color = '#f59e0b';
         } else {
-          helper.textContent = `Amount: RM${parseFloat(value).toFixed(2)}`;
+          helper.textContent = `Amount: RM${displayValue}`;
           helper.style.color = '#059669';
         }
       }
@@ -388,16 +397,40 @@
 
     // Add smart input formatting for mobile
     amountInput.addEventListener('input', handleAmountInput);
+    
+    // Handle backspace and delete keys properly
+    amountInput.addEventListener('keydown', function(e) {
+      // Allow backspace, delete, tab, escape, enter
+      if ([8, 9, 27, 13, 46].includes(e.keyCode) ||
+          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          (e.keyCode === 65 && e.ctrlKey) ||
+          (e.keyCode === 67 && e.ctrlKey) ||
+          (e.keyCode === 86 && e.ctrlKey) ||
+          (e.keyCode === 88 && e.ctrlKey)) {
+        return;
+      }
+      // Ensure that it is a number and stop the keypress
+      if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+      }
+    });
+    
+    // Initialize helper text
+    updateHelperText('', '');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       if (processing) return;
       
-      const amount = parseFloat(amountInput.value);
+      // Get the actual amount from the formatted display value
+      const displayValue = amountInput.value;
+      const rawValue = amountInput.dataset.rawValue || '';
+      const amount = parseFloat(displayValue);
+      const cents = parseInt(rawValue) || 0;
       
-      if (!amount || amount < 0.50) {
-        showStatus('Please enter an amount of at least RM0.50', 'error');
+      if (!displayValue || cents < 50) {
+        showStatus('Please enter an amount of at least RM0.50 (type 50)', 'error');
         return;
       }
 
