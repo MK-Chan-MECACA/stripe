@@ -431,7 +431,7 @@
         return;
       }
 
-      await processPayment(amount);
+      await processPayment(cents);
     });
 
     async function processPayment(amount) {
@@ -443,7 +443,7 @@
         showStatus('Creating payment...', 'processing');
         
         // Step 1: Create PaymentIntent (cents already calculated from raw input)
-        const amountCents = cents;
+        const amountCents = amount;
         const paymentIntent = await createPaymentIntent(amountCents);
         
         if (!paymentIntent || !paymentIntent.id) {
