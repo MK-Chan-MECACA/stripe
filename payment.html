@@ -368,9 +368,16 @@
         displayValue = dollars + '.' + cents;
       }
       
+      // Debug logging
+      console.log('Input value:', e.target.value);
+      console.log('Processed value:', value);
+      console.log('Display value:', displayValue);
+      
       // Store the raw numeric value for processing
       e.target.dataset.rawValue = value;
       e.target.value = displayValue;
+      
+      console.log('Final input value:', e.target.value);
       
       // Update helper text based on input
       updateHelperText(displayValue, value);
