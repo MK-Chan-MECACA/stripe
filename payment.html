@@ -343,33 +343,33 @@
     let processing = false;
     let rawDigits = ''; // Track raw digits separately
 
-    // Enhanced mobile input handling - automatic cents conversion
-    function handleAmountInput(e) {
-      const inputType = e.inputType;
-      
-      if (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') {
-        // Handle backspace/delete - remove last digit
-        rawDigits = rawDigits.slice(0, -1);
-      } else {
-        // Handle regular input - extract only new digits
-        const newInput = e.target.value.replace(/[^0-9]/g, '');
+    // Handle key presses for digit input
+    function handleKeyPress(e) {
+      // Allow only digits
+      if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault(); // Prevent default input behavior
         
-        // If user typed new digits, append them
-        if (newInput.length > rawDigits.length) {
-          const newDigits = newInput.slice(rawDigits.length);
-          rawDigits += newDigits;
-        } else if (newInput !== rawDigits.replace(/[^0-9]/g, '')) {
-          // If completely different, use the new input
-          rawDigits = newInput;
+        // Add the digit to our raw digits
+        if (rawDigits.length < 10) { // Max 10 digits
+          rawDigits += e.key;
+          updateDisplay();
         }
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        // Remove last digit
+        rawDigits = rawDigits.slice(0, -1);
+        updateDisplay();
+      } else if (['Tab', 'Enter', 'Escape'].includes(e.key)) {
+        // Allow navigation keys
+        return;
+      } else {
+        // Block all other keys
+        e.preventDefault();
       }
-      
-      // Limit to reasonable length (10 digits = max RM99,999,999.99)
-      if (rawDigits.length > 10) {
-        rawDigits = rawDigits.slice(0, 10);
-      }
-      
-      // Convert raw digits to display format
+    }
+
+    // Update the display based on raw digits
+    function updateDisplay() {
       let displayValue = '';
       if (rawDigits.length === 0) {
         displayValue = '';
@@ -384,8 +384,8 @@
       }
       
       // Store the raw numeric value and update display
-      e.target.dataset.rawValue = rawDigits;
-      e.target.value = displayValue;
+      amountInput.dataset.rawValue = rawDigits;
+      amountInput.value = displayValue;
       
       // Update helper text
       updateHelperText(displayValue, rawDigits);
@@ -411,24 +411,7 @@
     }
 
     // Add smart input formatting for mobile
-    amountInput.addEventListener('input', handleAmountInput);
-    
-    // Handle backspace and delete keys properly
-    amountInput.addEventListener('keydown', function(e) {
-      // Allow backspace, delete, tab, escape, enter
-      if ([8, 9, 27, 13, 46].includes(e.keyCode) ||
-          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (e.keyCode === 65 && e.ctrlKey) ||
-          (e.keyCode === 67 && e.ctrlKey) ||
-          (e.keyCode === 86 && e.ctrlKey) ||
-          (e.keyCode === 88 && e.ctrlKey)) {
-        return;
-      }
-      // Ensure that it is a number and stop the keypress
-      if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-        e.preventDefault();
-      }
-    });
+    amountInput.addEventListener('keydown', handleKeyPress);
     
     // Initialize helper text
     updateHelperText('', '');
