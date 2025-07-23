@@ -346,7 +346,7 @@
     function handleAmountInput(e) {
       let value = e.target.value;
       
-      // Remove any non-numeric characters
+      // Remove any non-numeric characters to get clean digits
       value = value.replace(/[^0-9]/g, '');
       
       // Limit to reasonable length (10 digits = max RM99,999,999.99)
@@ -368,19 +368,15 @@
         displayValue = dollars + '.' + cents;
       }
       
-      // Debug logging
-      console.log('Input value:', e.target.value);
-      console.log('Processed value:', value);
-      console.log('Display value:', displayValue);
-      
-      // Store the raw numeric value for processing
-      e.target.dataset.rawValue = value;
-      e.target.value = displayValue;
-      
-      console.log('Final input value:', e.target.value);
-      
-      // Update helper text based on input
-      updateHelperText(displayValue, value);
+      // Only update if the display value is different to prevent infinite loops
+      if (e.target.value !== displayValue) {
+        // Store the raw numeric value for processing
+        e.target.dataset.rawValue = value;
+        e.target.value = displayValue;
+        
+        // Update helper text based on input
+        updateHelperText(displayValue, value);
+      }
     }
     
     function updateHelperText(displayValue, rawValue) {
